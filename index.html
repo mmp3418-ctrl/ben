@@ -53,7 +53,6 @@
             position: relative;
         }
 
-        /* خلفية فاخرة محسنة */
         body::before {
             content: '';
             position: fixed;
@@ -73,7 +72,6 @@
             50% { opacity: 1; }
         }
 
-        /* خطوط ذهبية رفيعة في الخلفية */
         body::after {
             content: '';
             position: fixed;
@@ -85,7 +83,6 @@
             z-index: 0;
         }
 
-        /* جسيمات ذهبية محسنة */
         .particles {
             position: fixed;
             inset: 0;
@@ -115,7 +112,6 @@
             100% { transform: translateY(-10vh) scale(1.5) rotate(180deg); opacity: 0; }
         }
 
-        /* ============ شريط التنقل ============ */
         .navbar {
             position: fixed;
             top: 0;
@@ -215,7 +211,6 @@
             text-transform: uppercase;
         }
 
-        /* روابط سطح المكتب */
         .nav-links {
             display: flex;
             gap: 0.3rem;
@@ -269,7 +264,6 @@
             color: #fff;
         }
 
-        /* زر القائمة للهواتف */
         .mobile-toggle {
             display: none;
             background: var(--gold-gradient-subtle);
@@ -293,7 +287,6 @@
             box-shadow: var(--shadow-gold);
         }
 
-        /* قائمة الهواتف */
         .mobile-menu {
             display: none;
             position: fixed;
@@ -414,7 +407,6 @@
             font-size: 2rem;
         }
 
-        /* ============ الأقسام ============ */
         .section {
             position: relative;
             z-index: 1;
@@ -467,7 +459,6 @@
             border-radius: 10px;
         }
 
-        /* ============ القسم الرئيسي (هيرو) ============ */
         #home {
             min-height: 100vh;
             display: flex;
@@ -597,7 +588,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ============ قسم من نحن ============ */
         #about {
             background: var(--white);
             border-radius: var(--radius-xl);
@@ -681,7 +671,6 @@
             pointer-events: none;
         }
 
-        /* ============ قسم الأعمال ============ */
         #gallery {
             text-align: center;
         }
@@ -794,7 +783,6 @@
             letter-spacing: 1px;
         }
 
-        /* ============ قسم التواصل ============ */
         #contact {
             background: var(--white);
             border-radius: var(--radius-xl);
@@ -941,7 +929,6 @@
             grid-column: 1 / -1;
         }
 
-        /* ============ الفوتر ============ */
         .footer {
             text-align: center;
             padding: 1.8rem;
@@ -1030,9 +1017,7 @@
     <nav class="navbar" id="navbar">
         <div class="navbar-inner">
             <a href="#home" class="logo-area">
-                <div class="logo-icon">
-    <img src="lo.jpeg" alt="شعار بن موسى" style="width: 100%; height: 100%; object-fit: contain; border-radius: 16px;">
-</div>
+                <div class="logo-icon">ب</div>
                 <div class="logo-text">
                     <span class="logo-name">بن موسى</span>
                     <span class="logo-tag">Ben Musa</span>
@@ -1108,7 +1093,7 @@
             </div>
             <div class="gallery-dots" id="galleryDots"></div>
             <div class="gallery-counter">
-                صورة <span id="currentNum">1</span> / <span>25</span>
+                صورة <span id="currentNum">1</span> / <span id="totalImages">25</span>
             </div>
             <p class="swipe-hint">👈 اسحب للتنقل بين الصور</p>
         </div>
@@ -1242,24 +1227,47 @@
                 });
             });
 
-            // ============ معرض الصور (صيغة jpeg) ============
+            // ============ معرض الصور (الإصدار المحسن) ============
+            const TOTAL_IMAGES = 25; // غيّر هذا الرقم حسب عدد صورك
+            const IMAGE_PREFIX = 'j'; // بادئة اسم الملف
+            const IMAGE_EXTENSION = '.jpeg'; // امتداد الصور (غيّره إذا كانت jpg أو png)
+            const IMAGE_FOLDER = ''; // اتركه فارغاً إذا كانت الصور في نفس المجلد، أو ضع 'images/'
+
             const images = [];
-            for (let i = 1; i <= 25; i++) images.push(`j${i}.jpeg`);
+            for (let i = 1; i <= TOTAL_IMAGES; i++) {
+                images.push(`${IMAGE_FOLDER}${IMAGE_PREFIX}${i}${IMAGE_EXTENSION}`);
+            }
+
+            // طباعة أسماء الصور في console للتأكد
+            console.log('📸 الصور المطلوبة:');
+            images.forEach((img, i) => console.log(`  ${i + 1}: ${img}`));
+
             let currentIndex = 0;
             const galleryImage = document.getElementById('galleryImage');
             const prevBtn = document.getElementById('prevBtn');
             const nextBtn = document.getElementById('nextBtn');
             const currentNum = document.getElementById('currentNum');
+            const totalImagesSpan = document.getElementById('totalImages');
             const galleryDots = document.getElementById('galleryDots');
 
+            // تحديث العدد الإجمالي
+            if (totalImagesSpan) totalImagesSpan.textContent = TOTAL_IMAGES;
+
+            // إنشاء النقاط
+            galleryDots.innerHTML = '';
             images.forEach((_, i) => {
                 const dot = document.createElement('button');
                 dot.classList.add('gallery-dot');
-                dot.addEventListener('click', () => { currentIndex = i; updateGallery(); });
+                if (i === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => {
+                    currentIndex = i;
+                    updateGallery();
+                });
                 galleryDots.appendChild(dot);
             });
             const dots = galleryDots.querySelectorAll('.gallery-dot');
 
+            // دالة تحديث المعرض
             function updateGallery() {
                 if (!galleryImage) return;
                 galleryImage.style.opacity = '0';
@@ -1268,15 +1276,24 @@
                     galleryImage.alt = `عمل فني ${currentIndex + 1}`;
                     galleryImage.style.opacity = '1';
                 }, 200);
-                currentNum.textContent = currentIndex + 1;
+                if (currentNum) currentNum.textContent = currentIndex + 1;
                 dots.forEach((d, i) => d.classList.toggle('active', i === currentIndex));
             }
 
-            if (galleryImage) {
+            // تحميل الصورة الأولى
+            if (galleryImage && images.length > 0) {
                 galleryImage.src = images[0];
-                if (dots.length) dots[0].classList.add('active');
+                galleryImage.alt = 'عمل فني 1';
+                console.log('✅ تم تحميل الصورة الأولى:', images[0]);
             }
 
+            // معالجة خطأ تحميل الصور
+            galleryImage.addEventListener('error', function() {
+                console.warn('⚠️ فشل تحميل الصورة:', this.src);
+                console.warn('تأكد من وجود الملف في المسار الصحيح.');
+            });
+
+            // أزرار التنقل
             prevBtn?.addEventListener('click', () => {
                 currentIndex = (currentIndex - 1 + images.length) % images.length;
                 updateGallery();
@@ -1328,7 +1345,7 @@
             });
 
             console.log('%c✨ بن موسى Ben Musa - موقع فاخر ✨', 'color:#e3a852;font-size:1.2rem;');
-            console.log('%cضع صور j1.jpeg إلى j25.jpeg في مجلد الموقع', 'color:#ab6f23;');
+            console.log('%c📸 تأكد من وجود الصور في المجلد الصحيح', 'color:#ab6f23;');
         })();
     </script>
 </body>
